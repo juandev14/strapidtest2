@@ -1,5 +1,8 @@
 FROM node:18
 
+# Instalar netcat y dependencias necesarias
+RUN apt-get update && apt-get install -y netcat-openbsd
+
 # Crear y posicionarse en el directorio de la aplicación
 WORKDIR /srv/app
 
