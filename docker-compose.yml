@@ -16,22 +16,22 @@ services:
       - backend
     ports:
       - "3306:3306"
-  
+
   strapi:
-    build: 
+    build:
       context: .
-      dockerfile: Dockerfile.strapi  # Usa un Dockerfile personalizado
+      dockerfile: Dockerfile.strapi
     container_name: strapi_container
     restart: always
     environment:
-      DATABASE_CLIENT: mysql2  # Usar mysql2 en lugar de mysql
+      DATABASE_CLIENT: mysql2
       DATABASE_HOST: mysql
       DATABASE_PORT: 3306
       DATABASE_NAME: dbprueba1
       DATABASE_USERNAME: usermysql1
       DATABASE_PASSWORD: 123456
     volumes:
-      - strapi_data:/srv/app
+      - ./src:/srv/app  # Asegúrate de que el código se monte correctamente
     networks:
       - backend
     ports:
@@ -40,13 +40,13 @@ services:
       - mysql
     entrypoint: >
       /bin/sh -c "
-        apt-get update && apt-get install -y netcat && 
+        apt-get update && apt-get install -y netcat-openbsd && 
         until nc -z mysql 3306; do 
           echo 'Waiting for MySQL...'; 
           sleep 5; 
         done; 
-        npm install mysql2 && # Instalar mysql2 en Strapi
-        strapi start
+        npm install && 
+        npm run develop
       "
 
 networks:

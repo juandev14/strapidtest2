@@ -1,17 +1,19 @@
-# Usa una imagen oficial de Node.js
 FROM node:18
 
-# Establece el directorio de trabajo dentro del contenedor
+# Crear y posicionarse en el directorio de la aplicación
 WORKDIR /srv/app
 
-# Instala dependencias del sistema necesarias
-RUN apt-get update && apt-get install -y netcat-openbsd
+# Copiar package.json y package-lock.json primero para optimizar caché
+COPY package.json package-lock.json ./
 
-# Instala Strapi y MySQL2 globalmente
-RUN npm install -g strapi@latest && npm install mysql2
+# Instalar dependencias antes de copiar todo el código
+RUN npm install
 
-# Expone el puerto 1337 para Strapi
+# Copiar el código fuente de Strapi
+COPY . .
+
+# Exponer el puerto 1337
 EXPOSE 1337
 
-# Comando por defecto para iniciar Strapi
-CMD ["strapi", "start"]
+# Comando de inicio
+CMD ["npm", "run", "develop"]
