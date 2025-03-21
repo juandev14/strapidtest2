@@ -12,6 +12,9 @@ COPY package.json package-lock.json ./
 # Instalar dependencias antes de copiar el código
 RUN npm install
 
+# Instalar mysql2 manualmente
+RUN npm install mysql2
+
 # Copiar el código fuente de Strapi
 COPY . .
 
