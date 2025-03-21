@@ -36,7 +36,15 @@ services:
       - "1337:1337"
     depends_on:
       - mysql
-    entrypoint: /bin/sh -c "apt-get update && apt-get install -y netcat && until nc -z mysql 3306; do echo 'Waiting for MySQL...'; sleep 2; done; strapi start"
+    entrypoint: >
+      /bin/sh -c "
+        apt-get update && apt-get install -y netcat && 
+        until nc -z mysql 3306; do 
+          echo 'Waiting for MySQL...'; 
+          sleep 5; 
+        done; 
+        strapi start
+      "
 
 networks:
   backend:
