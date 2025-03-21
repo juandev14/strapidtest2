@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql_container1
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: dbprueba1
+      MYSQL_USER: usermysql1
+      MYSQL_PASSWORD: 123456
+    volumes:
+      - mysql_data1:/var/lib/mysql
+    networks:
+      - backend
+    ports:
+      - "3306:3306"
+
+  strapi:
+    image: strapi/strapi
+    container_name: strapi_container
+    restart: always
+    environment:
+      DATABASE_CLIENT: mysql
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      DATABASE_NAME: dbprueba1
+      DATABASE_USERNAME: usermysql1
+      DATABASE_PASSWORD: 123456
+    volumes:
+      - strapi_data:/srv/app
+    networks:
+      - backend
+    ports:
+      - "1337:1337"
+    depends_on:
+      - mysql
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins_container
+    restart: always
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  mysql_data1:
+  strapi_data:
+  jenkins_home:
