@@ -2,30 +2,37 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_COMPOSE_FILE = 'docker-compose.yml'  // Cambié el nombre del archivo aquí
+        DOCKER_COMPOSE_FILE = 'docker-compose.yml'
+        WORKSPACE_DIR = '/var/jenkins_home/workspace/deploy-strapi' // Ajusta según sea necesario
     }
 
     stages {
         stage('Clonar Repo') {
             steps {
-                // Clonar el repositorio con el archivo docker-compose.yml
                 git 'https://github.com/juandev14/strapidtest2.git'
+            }
+        }
+
+        stage('Mostrar Directorio') {
+            steps {
+                script {
+                    sh 'pwd'
+                    sh 'ls -la'
+                }
             }
         }
 
         stage('Construir y Desplegar Contenedores') {
             steps {
                 script {
-                    // Asegurarse de que Docker y Docker Compose están disponibles
                     sh 'docker --version'
                     sh 'docker-compose --version'
                     
-                    // Detener y eliminar cualquier contenedor anterior que tenga conflicto
+                    // Parar y eliminar contenedores solo si existen
                     sh 'docker rm -f mysql_container1 || true'
                     sh 'docker rm -f strapi_container || true'
                     
-                    // Ejecutar docker-compose para levantar los contenedores en segundo plano
-                    sh "docker-compose -f $DOCKER_COMPOSE_FILE down"
+                    // Iniciar los contenedores
                     sh "docker-compose -f $DOCKER_COMPOSE_FILE up -d --build"
                 }
             }
@@ -34,7 +41,6 @@ pipeline {
         stage('Esperar que MySQL esté listo') {
             steps {
                 script {
-                    // Asegurarse de que MySQL está listo antes de iniciar Strapi
                     sh """
                         until docker exec strapi_container nc -z mysql 3306; do
                             echo 'Esperando que MySQL esté listo...';
@@ -48,7 +54,6 @@ pipeline {
         stage('Verificar que Strapi está corriendo') {
             steps {
                 script {
-                    // Verificar si Strapi está corriendo correctamente
                     sh 'docker ps'
                     sh 'docker-compose logs strapi'
                 }
@@ -57,18 +62,13 @@ pipeline {
     }
 
     post {
-        always {
-            // Limpiar los contenedores al finalizar
-            echo 'Limpiando contenedores...'
+        failure {
+            echo '¡Hubo un error en el despliegue! Eliminando contenedores...'
             sh 'docker-compose down'
         }
 
         success {
-            echo '¡Despliegue exitoso!'
-        }
-
-        failure {
-            echo '¡Hubo un error en el despliegue!'
+            echo '¡Despliegue exitoso! Contenedores en ejecución.'
         }
     }
 }
