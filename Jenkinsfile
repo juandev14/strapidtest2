@@ -9,6 +9,8 @@ pipeline {
         stage('Clonar Repo') {
             steps {
                 git 'https://github.com/juandev14/strapidtest2.git'
+                sh 'pwd'
+                sh 'ls -la'
             }
         }
 
