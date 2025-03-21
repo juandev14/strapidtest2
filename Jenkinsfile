@@ -8,8 +8,8 @@ pipeline {
         }
         stage('Construir Contenedor Strapi') {
             steps {
-                sh 'docker-compose down'
-                sh 'docker-compose up -d --build strapi'
+                sh 'docker-compose -f mysql-docker-strapi-compose.yaml down'
+                sh 'docker-compose -f mysql-docker-strapi-compose.yaml up -d --build strapi'
             }
         }
     }
