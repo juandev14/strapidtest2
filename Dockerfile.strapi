@@ -1,15 +1,15 @@
 FROM node:18
 
 # Instalar netcat y dependencias necesarias
-RUN apt-get update && apt-get install -y netcat-openbsd
+RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/lists/*
 
 # Crear y posicionarse en el directorio de la aplicación
 WORKDIR /srv/app
 
-# Copiar package.json y package-lock.json primero para optimizar caché
+# Copiar solo package.json y package-lock.json para aprovechar la caché de Docker
 COPY package.json package-lock.json ./
 
-# Instalar dependencias antes de copiar todo el código
+# Instalar dependencias antes de copiar el código
 RUN npm install
 
 # Copiar el código fuente de Strapi

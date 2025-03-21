@@ -31,7 +31,7 @@ services:
       DATABASE_USERNAME: usermysql1
       DATABASE_PASSWORD: 123456
     volumes:
-      - .:/srv/app
+       - strapi_data:/srv/app
     networks:
       - backend
     ports:
