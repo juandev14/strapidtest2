@@ -10,7 +10,6 @@ services:
       MYSQL_DATABASE: dbprueba1
       MYSQL_USER: usermysql1
       MYSQL_PASSWORD: 123456
-      MYSQL_INITDB_SKIP_TZINFO: "1"
     command: --default-authentication-plugin=mysql_native_password
     volumes:
       - mysql_data1:/var/lib/mysql
@@ -20,11 +19,13 @@ services:
       - "3306:3306"
   
   strapi:
-    image: strapi/strapi
+    build: 
+      context: .
+      dockerfile: Dockerfile.strapi  # Usa un Dockerfile personalizado
     container_name: strapi_container
     restart: always
     environment:
-      DATABASE_CLIENT: mysql
+      DATABASE_CLIENT: mysql2  # Usar mysql2 en lugar de mysql
       DATABASE_HOST: mysql
       DATABASE_PORT: 3306
       DATABASE_NAME: dbprueba1
@@ -38,6 +39,16 @@ services:
       - "1337:1337"
     depends_on:
       - mysql
+    entrypoint: >
+      /bin/sh -c "
+        apt-get update && apt-get install -y netcat && 
+        until nc -z mysql 3306; do 
+          echo 'Waiting for MySQL...'; 
+          sleep 5; 
+        done; 
+        npm install mysql2 && # Instalar mysql2 en Strapi
+        strapi start
+      "
 
 networks:
   backend:
