@@ -1,12 +1,16 @@
+# Usa una imagen oficial de Node.js
 FROM node:18
 
-# Establecer directorio de trabajo
+# Establece el directorio de trabajo dentro del contenedor
 WORKDIR /srv/app
 
-# Instalar dependencias de Strapi y MySQL2
-RUN npm install mysql2
+# Instala dependencias del sistema necesarias
+RUN apt-get update && apt-get install -y netcat-openbsd
 
-# Exponer el puerto de Strapi
+# Instala Strapi y MySQL2 globalmente
+RUN npm install -g strapi@latest && npm install mysql2
+
+# Expone el puerto 1337 para Strapi
 EXPOSE 1337
 
 # Comando por defecto para iniciar Strapi
