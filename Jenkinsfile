@@ -36,11 +36,6 @@ pipeline {
     }
 
     post {
-        always {
-            echo 'Limpiando contenedores...'
-            sh 'docker-compose down'
-        }
-
         success {
             echo '¡Despliegue exitoso!'
         }
